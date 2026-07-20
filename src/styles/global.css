@@ -1,0 +1,133 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color: var(--color-text);
+  background: var(--color-background);
+  font-family: var(--font-family-body);
+  line-height: var(--line-height-body);
+}
+
+body {
+  min-width: 20rem;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+a,
+input {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 0.1875rem solid var(--color-focus);
+  outline-offset: 0.1875rem;
+}
+
+.page-shell {
+  width: min(100% - var(--space-8), 44rem);
+  margin-inline: auto;
+  padding-block: var(--space-12);
+}
+
+.surface {
+  padding: var(--space-8);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-surface);
+}
+
+h1 {
+  margin-block: 0 var(--space-4);
+  font-size: var(--font-size-heading);
+  line-height: 1.2;
+}
+
+h2,
+p {
+  margin-block: 0 var(--space-4);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-4);
+  border: var(--border-width) solid var(--color-accent);
+  border-radius: var(--border-radius);
+  color: var(--color-accent-contrast);
+  background: var(--color-accent);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+fieldset {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice {
+  display: flex;
+  gap: var(--space-3);
+  align-items: start;
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--border-radius);
+}
+
+.choice:has(input:checked) {
+  border-color: var(--color-accent);
+}
+
+ul {
+  padding-left: var(--space-6);
+}
+
+@media (max-width: 32rem) {
+  .page-shell {
+    width: min(100% - var(--space-4), 44rem);
+    padding-block: var(--space-4);
+  }
+
+  .surface {
+    padding: var(--space-6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
