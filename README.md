@@ -7,28 +7,28 @@ A browser-based, choose-your-adventure personality test for a game-themed teachi
 Install dependencies and start the Vite development server:
 
 ```bash
-npm install
-npm run dev
+yarn install
+yarn dev
 ```
 
 ## Commands
 
 ```bash
-npm run dev        # Start the development server
-npm run lint       # Run ESLint
-npm run typecheck  # Check TypeScript types
-npm run test       # Run tests in watch mode
-npm run test:run   # Run tests once
-npm run build      # Create a production build
+yarn dev        # Start the development server
+yarn lint       # Run ESLint
+yarn typecheck  # Check TypeScript types
+yarn test       # Run tests in watch mode
+yarn test:run   # Run tests once
+yarn build      # Create a production build
 ```
 
 Run the complete verification set before considering a change finished:
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test:run
-npm run build
+yarn lint
+yarn typecheck
+yarn test:run
+yarn build
 ```
 
 ## Project documentation

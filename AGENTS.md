@@ -37,25 +37,25 @@ Do not introduce additional production dependencies unless they solve a demonstr
 
 ## Commands
 
-Use npm as the package manager.
+Use Yarn as the package manager.
 
 ```bash
-npm install
-npm run dev
-npm run build
-npm run lint
-npm run test
-npm run test:run
-npm run typecheck
+yarn install
+yarn dev
+yarn build
+yarn lint
+yarn test
+yarn test:run
+yarn typecheck
 ```
 
 Before considering work complete, run:
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test:run
-npm run build
+yarn lint
+yarn typecheck
+yarn test:run
+yarn build
 ```
 
 ## Repository structure
