@@ -21,6 +21,29 @@ text contrast. Dark neutral text is preferred on pastel surfaces, and Primary
 Purple is used for large text or non-text visual emphasis when its contrast is
 not sufficient for smaller copy.
 
+### Dark mode
+
+The interface follows `prefers-color-scheme` and switches semantic color tokens
+without changing component markup. Dark mode retains the purple identity while
+moving the page and card hierarchy onto deep aubergine surfaces.
+
+| Color | Dark-mode role |
+| --- | --- |
+| `#100A18` | Page background |
+| `#1A1126` | Supporting surfaces and answer choices |
+| `#221631` | Raised cards and controls |
+| `#322047` | Emphasized and disabled surfaces |
+| `#B88CFF` | Primary purple emphasis, progress, and large headings |
+| `#C7A4FF` | Interactive fills and interface-label emphasis |
+| `#F7F2FC` | Primary text |
+| `#C3B6CE` | Secondary text |
+
+Filled purple controls use deep aubergine text in dark mode so buttons and
+selected answers retain strong contrast. Focus rings use a lighter lavender,
+and shadows shift from purple haze to translucent black to preserve surface
+depth without muddying the palette. Browser chrome receives matching light and
+dark theme colors from `index.html`.
+
 ## Typography
 
 **Primary Typeface: Saira**

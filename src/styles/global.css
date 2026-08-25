@@ -24,7 +24,7 @@ body {
     ),
     radial-gradient(
       circle at 92% 90%,
-      var(--color-primary-soft) 0,
+      var(--color-background-accent) 0,
       transparent 28rem
     ),
     linear-gradient(
@@ -213,7 +213,7 @@ p {
     linear-gradient(
       135deg,
       transparent 35%,
-      rgb(255 255 255 / 52%) 50%,
+      var(--color-image-sheen) 50%,
       transparent 65%
     ),
     radial-gradient(
@@ -543,7 +543,7 @@ legend {
   min-width: 0;
   min-height: 3.25rem;
   padding: var(--space-3) var(--space-4);
-  border: var(--border-width) solid var(--color-border-soft);
+  border: var(--border-width) solid var(--color-border);
   border-radius: var(--border-radius);
   color: var(--color-text-primary);
   background: var(--color-surface);
@@ -588,7 +588,7 @@ legend {
   width: 1.25rem;
   height: 1.25rem;
   margin: 0.125rem 0 0;
-  border: 0.125rem solid var(--color-primary-soft);
+  border: 0.125rem solid var(--color-border);
   border-radius: 50%;
   background: var(--color-surface-raised);
   cursor: pointer;
