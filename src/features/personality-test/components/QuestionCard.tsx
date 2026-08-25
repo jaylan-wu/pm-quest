@@ -67,10 +67,7 @@ export function QuestionCard({
         </progress>
       </div>
 
-      <QuestionImage
-        image={question.image}
-        questionNumber={questionNumber}
-      />
+      <QuestionImage image={question.image} />
 
       <div className="question-prompt">
         <p className="muted ui-label">

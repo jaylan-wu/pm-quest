@@ -4,19 +4,14 @@ import type { QuestionImage as QuestionImageData } from '../types'
 
 export interface QuestionImageProps {
   readonly image?: QuestionImageData
-  readonly questionNumber: number
 }
 
-export function QuestionImage({
-  image,
-  questionNumber,
-}: QuestionImageProps): ReactElement {
+export function QuestionImage({ image }: QuestionImageProps): ReactElement {
   const [failedSource, setFailedSource] = useState<string>()
   const [loadedSource, setLoadedSource] = useState<string>()
   const source = image?.src
   const alt = image?.alt ?? ''
   const position = image?.position ?? 'center'
-  const formattedQuestionNumber = String(questionNumber).padStart(2, '0')
   const hasUsableSource = source !== undefined && source.length > 0
   const hasFailed = hasUsableSource && failedSource === source
   const hasLoaded = hasUsableSource && loadedSource === source
@@ -51,10 +46,6 @@ export function QuestionImage({
             </span>
           </div>
         ) : null}
-
-        <span className="question-image__label ui-label" aria-hidden="true">
-          Scene / {formattedQuestionNumber}
-        </span>
       </div>
     </div>
   )

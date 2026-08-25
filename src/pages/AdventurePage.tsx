@@ -13,9 +13,7 @@ export function AdventurePage(): ReactElement {
     (answer) => answer.questionId === question?.id,
   )?.choiceId
   const nextQuestionImageSource =
-    state.isStarted &&
-    !state.isComplete &&
-    selectedChoiceId !== undefined
+    state.isStarted && !state.isComplete
       ? questions[state.currentQuestionIndex + 1]?.image?.src
       : undefined
 
@@ -26,7 +24,6 @@ export function AdventurePage(): ReactElement {
 
     const nextQuestionImage = new Image()
     nextQuestionImage.decoding = 'async'
-    nextQuestionImage.fetchPriority = 'low'
     nextQuestionImage.src = nextQuestionImageSource
   }, [nextQuestionImageSource])
 

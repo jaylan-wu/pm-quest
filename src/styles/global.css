@@ -261,19 +261,6 @@ p {
   color: var(--color-text-secondary);
 }
 
-.question-image__label {
-  position: absolute;
-  z-index: 3;
-  inset-block-end: 0;
-  inset-inline-start: 0;
-  padding: var(--space-1) var(--space-2);
-  border-block-start: var(--border-width) solid var(--color-border-soft);
-  border-inline-end: var(--border-width) solid var(--color-border-soft);
-  border-start-end-radius: var(--space-2);
-  background: var(--color-surface-raised);
-  font-variant-numeric: tabular-nums;
-}
-
 .question-prompt {
   margin-top: var(--space-6);
 }

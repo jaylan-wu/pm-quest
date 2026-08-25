@@ -175,7 +175,7 @@ describe('personality test routes', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 
-  it('preloads only the next question image as the quiz advances', async () => {
+  it('preloads only the next image as soon as each question renders', async () => {
     const preloadedSources: string[] = []
 
     class PreloadImageStub {
@@ -193,7 +193,7 @@ describe('personality test routes', () => {
       screen.getByRole('button', { name: 'Start the test' }),
     )
 
-    expect(preloadedSources).toEqual([])
+    expect(preloadedSources).toEqual([questions[1].image.src])
 
     await user.click(screen.getAllByRole('radio')[0])
 
@@ -201,7 +201,9 @@ describe('personality test routes', () => {
 
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
-    expect(preloadedSources).toEqual([questions[1].image.src])
+    expect(preloadedSources).toEqual(
+      questions.slice(1, 3).map((question) => question.image.src),
+    )
 
     for (
       let questionIndex = 1;

@@ -5,9 +5,7 @@ import { QuestionImage } from './QuestionImage'
 
 describe('QuestionImage', () => {
   it('reserves the image viewport and shows a placeholder without a source', () => {
-    const { container } = render(
-      <QuestionImage image={{ alt: '' }} questionNumber={1} />,
-    )
+    const { container } = render(<QuestionImage image={{ alt: '' }} />)
 
     expect(
       container.querySelector('.question-image__viewport'),
@@ -16,6 +14,7 @@ describe('QuestionImage', () => {
       container.querySelector('.question-image__placeholder'),
     ).toBeInTheDocument()
     expect(screen.queryByRole('img')).not.toBeInTheDocument()
+    expect(screen.queryByText(/^Scene \/ \d{2}$/i)).not.toBeInTheDocument()
   })
 
   it('shows a loaded image with authored alt text and crop positioning', () => {
@@ -26,7 +25,6 @@ describe('QuestionImage', () => {
           alt: 'An alarm clock beside a bed.',
           position: '50% 35%',
         }}
-        questionNumber={1}
       />,
     )
 
@@ -54,7 +52,6 @@ describe('QuestionImage', () => {
           src: '/assets/questions/missing.webp',
           alt: 'A campus scene.',
         }}
-        questionNumber={4}
       />,
     )
 
@@ -74,7 +71,6 @@ describe('QuestionImage', () => {
     const { container, rerender } = render(
       <QuestionImage
         image={{ src: '/assets/questions/first.webp', alt: 'First scene.' }}
-        questionNumber={1}
       />,
     )
 
@@ -83,7 +79,6 @@ describe('QuestionImage', () => {
     rerender(
       <QuestionImage
         image={{ src: '/assets/questions/second.webp', alt: 'Second scene.' }}
-        questionNumber={2}
       />,
     )
 
