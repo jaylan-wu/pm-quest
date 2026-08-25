@@ -1,16 +1,20 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { TestSessionProvider } from '../features/personality-test/TestSessionProvider'
 import { gamerClasses } from '../features/personality-test/data/gamerClasses'
 import { questions } from '../features/personality-test/data/questions'
-import { AppRoutes } from './App'
+import { App, AppRoutes } from './App'
 
 const RAW_SCORE_MAPPING =
   /\b(?:moba|fps|rpg|sports|sandbox|mobile|tabletop)\b["']?\s*(?:\+|:|=)?\s*[123]\b/i
 const RAW_SCORE_VALUE = /\+\s*[123]\b/
+
+afterEach(() => {
+  window.history.replaceState(null, '', '/')
+})
 
 function expectRawScoresToBeHidden(): void {
   expect(document.body).not.toHaveTextContent(RAW_SCORE_MAPPING)
@@ -31,6 +35,20 @@ function renderAt(path: string): void {
 }
 
 describe('personality test routes', () => {
+  it('keeps navigation within the GitHub Pages path', async () => {
+    const user = userEvent.setup()
+    window.history.replaceState(null, '', '/pm-quest/#/')
+
+    render(<App />)
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start the test' }),
+    )
+
+    expect(window.location.pathname).toBe('/pm-quest/')
+    expect(window.location.hash).toBe('#/adventure')
+  })
+
   it('redirects an incomplete result visit to the landing page', async () => {
     renderAt('/result')
 

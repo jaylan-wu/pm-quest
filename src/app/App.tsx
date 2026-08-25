@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react'
 import {
-  BrowserRouter,
+  HashRouter,
   Navigate,
   Route,
   Routes,
@@ -24,10 +24,10 @@ export function AppRoutes(): ReactElement {
 
 export function App(): ReactElement {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <TestSessionProvider>
         <AppRoutes />
       </TestSessionProvider>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
