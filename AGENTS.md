@@ -236,6 +236,12 @@ Global styling belongs in:
 src/styles/
 ```
 
+Browser-served question image assets belong in:
+
+```text
+public/assets/questions/
+```
+
 Project documentation belongs in:
 
 ```text

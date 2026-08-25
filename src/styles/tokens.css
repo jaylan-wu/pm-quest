@@ -12,6 +12,7 @@
 
   --color-primary: var(--color-purple);
   --color-primary-hover: #8454d1;
+  --color-primary-strong: #7140bd;
   --color-primary-soft: var(--color-mauve);
 
   --color-border: var(--color-mauve);

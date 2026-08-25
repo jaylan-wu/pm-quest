@@ -29,10 +29,17 @@ export interface QuizChoice {
   readonly scores: Readonly<Partial<Record<GamerClassId, number>>>
 }
 
+export interface QuestionImage {
+  readonly src?: string
+  readonly alt: string
+  readonly position?: string
+}
+
 export interface QuizQuestion {
   readonly id: QuestionId
   readonly title: string
   readonly scenario?: string
+  readonly image?: QuestionImage
   readonly choices: readonly QuizChoice[]
 }
 

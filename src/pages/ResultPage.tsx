@@ -1,15 +1,8 @@
 import type { ReactElement } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 
+import { GamerStatsList } from '../features/personality-test/components/GamerStatsList'
 import { useTestSession } from '../features/personality-test/useTestSession'
-
-const gamerStatLabels = [
-  ['teamwork', 'Teamwork'],
-  ['strategy', 'Strategy'],
-  ['creativity', 'Creativity'],
-  ['competitiveness', 'Competitiveness'],
-  ['adaptability', 'Adaptability'],
-] as const
 
 export function ResultPage(): ReactElement {
   const { state, dispatch } = useTestSession()
@@ -39,26 +32,15 @@ export function ResultPage(): ReactElement {
         <p>{gamerClass.description}</p>
 
         <h2 className="result-section-heading ui-label">Character stats</h2>
-        <dl className="character-stats">
-          {gamerStatLabels.map(([stat, label]) => (
-            <div key={stat}>
-              <dt>{label}</dt>
-              <dd>{gamerClass.stats[stat]} / 10</dd>
-              <dd className="character-stat-visual" aria-hidden="true">
-                <progress
-                  className="character-stat-meter"
-                  value={gamerClass.stats[stat]}
-                  max={10}
-                />
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <GamerStatsList stats={gamerClass.stats} />
 
-        <div className="actions">
+        <div className="actions result-actions">
           <button className="button" type="button" onClick={handleRestart}>
             Take the test again
           </button>
+          <Link className="button button-secondary" to="/gamer-types">
+            View all gamer types
+          </Link>
         </div>
       </article>
     </main>

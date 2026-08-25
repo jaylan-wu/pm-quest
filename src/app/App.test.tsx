@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TestSessionProvider } from '../features/personality-test/TestSessionProvider'
 import { gamerClasses } from '../features/personality-test/data/gamerClasses'
@@ -13,6 +13,7 @@ const RAW_SCORE_MAPPING =
 const RAW_SCORE_VALUE = /\+\s*[123]\b/
 
 afterEach(() => {
+  vi.unstubAllGlobals()
   window.history.replaceState(null, '', '/')
 })
 
@@ -32,6 +33,24 @@ function renderAt(path: string): void {
       </TestSessionProvider>
     </MemoryRouter>,
   )
+}
+
+async function completeQuizWithFirstChoices(
+  user: ReturnType<typeof userEvent.setup>,
+): Promise<void> {
+  await user.click(screen.getByRole('button', { name: 'Start the test' }))
+
+  for (const [questionIndex] of questions.entries()) {
+    await user.click(screen.getAllByRole('radio')[0])
+    await user.click(
+      screen.getByRole('button', {
+        name:
+          questionIndex === questions.length - 1
+            ? 'See result'
+            : 'Continue',
+      }),
+    )
+  }
 }
 
 describe('personality test routes', () => {
@@ -59,6 +78,159 @@ describe('personality test routes', () => {
     ).toBeInTheDocument()
   })
 
+  it('renders every canonical gamer type on a direct visit without marking a current type', () => {
+    renderAt('/gamer-types')
+
+    expect(
+      screen.getByRole('heading', { name: 'All Gamer Types' }),
+    ).toBeInTheDocument()
+
+    const directory = screen.getByRole('region', { name: 'Gamer types' })
+    expect(within(directory).getAllByRole('article')).toHaveLength(
+      gamerClasses.length,
+    )
+
+    for (const gamerClass of gamerClasses) {
+      expect(
+        within(directory).getByRole('heading', {
+          name: gamerClass.name,
+        }),
+      ).toBeInTheDocument()
+      expect(
+        within(directory).getByText(gamerClass.description),
+      ).toBeInTheDocument()
+    }
+
+    expect(screen.queryByText(/^Your type$/i)).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Take the test' }),
+    ).toBeInTheDocument()
+    expectRawScoresToBeHidden()
+  })
+
+  it('opens the gamer-type directory from a result and starts a clean retake', async () => {
+    const user = userEvent.setup()
+    renderAt('/')
+
+    await completeQuizWithFirstChoices(user)
+
+    const resultGamerClass = gamerClasses.find((gamerClass) =>
+      screen.queryByRole('heading', { name: gamerClass.name }),
+    )
+
+    expect(resultGamerClass).toBeDefined()
+    if (resultGamerClass === undefined) {
+      throw new Error('Expected the completed quiz to render a gamer type')
+    }
+
+    await user.click(
+      screen.getByRole('link', { name: 'View all gamer types' }),
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'All Gamer Types' }),
+    ).toBeInTheDocument()
+
+    const directory = screen.getByRole('region', { name: 'Gamer types' })
+    expect(within(directory).getAllByRole('article')).toHaveLength(
+      gamerClasses.length,
+    )
+
+    const currentTypeLabels = within(directory).getAllByText(
+      /^Your type$/i,
+    )
+    expect(currentTypeLabels).toHaveLength(1)
+
+    const currentTypeCard = currentTypeLabels[0]?.closest('article')
+    expect(currentTypeCard).not.toBeNull()
+    if (currentTypeCard === null) {
+      throw new Error('Expected the current-type label to be inside a card')
+    }
+
+    expect(
+      within(currentTypeCard).getByRole('heading', {
+        name: resultGamerClass.name,
+      }),
+    ).toBeInTheDocument()
+    expectRawScoresToBeHidden()
+
+    await user.click(
+      screen.getByRole('button', { name: 'Take the test again' }),
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: questions[0].title }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('progressbar', { name: 'Quiz progress' }),
+    ).toHaveAttribute('value', '1')
+    expect(
+      screen.getByRole('progressbar', { name: 'Quiz progress' }),
+    ).toHaveAttribute('max', String(questions.length))
+
+    for (const radio of screen.getAllByRole('radio')) {
+      expect(radio).not.toBeChecked()
+    }
+
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  })
+
+  it('preloads only the next question image as the quiz advances', async () => {
+    const preloadedSources: string[] = []
+
+    class PreloadImageStub {
+      set src(source: string) {
+        preloadedSources.push(source)
+      }
+    }
+
+    vi.stubGlobal('Image', PreloadImageStub)
+
+    const user = userEvent.setup()
+    renderAt('/')
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start the test' }),
+    )
+
+    expect(preloadedSources).toEqual([])
+
+    await user.click(screen.getAllByRole('radio')[0])
+
+    expect(preloadedSources).toEqual([questions[1].image.src])
+
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(preloadedSources).toEqual([questions[1].image.src])
+
+    for (
+      let questionIndex = 1;
+      questionIndex < questions.length;
+      questionIndex += 1
+    ) {
+      await user.click(screen.getAllByRole('radio')[0])
+
+      expect(preloadedSources).toEqual(
+        questions
+          .slice(1, Math.min(questionIndex + 2, questions.length))
+          .map((question) => question.image.src),
+      )
+
+      await user.click(
+        screen.getByRole('button', {
+          name:
+            questionIndex === questions.length - 1
+              ? 'See result'
+              : 'Continue',
+        }),
+      )
+    }
+
+    expect(preloadedSources).toEqual(
+      questions.slice(1).map((question) => question.image.src),
+    )
+  })
+
   it('supports the complete landing-to-result flow', async () => {
     const user = userEvent.setup()
     renderAt('/')
@@ -76,6 +248,12 @@ describe('personality test routes', () => {
         screen.getByText(`Question ${questionNumber} of ${questions.length}`),
       ).toBeInTheDocument()
       expect(
+        screen.getByRole('progressbar', { name: 'Quiz progress' }),
+      ).toHaveAttribute('value', String(questionNumber))
+      expect(
+        screen.getByRole('progressbar', { name: 'Quiz progress' }),
+      ).toHaveAttribute('max', String(questions.length))
+      expect(
         screen.getByRole('heading', { name: question.title }),
       ).toBeInTheDocument()
       expect(screen.getAllByRole('radio')).toHaveLength(
@@ -90,7 +268,20 @@ describe('personality test routes', () => {
 
       expectRawScoresToBeHidden()
 
-      await user.click(screen.getAllByRole('radio')[0])
+      const selectedRadio = screen.getAllByRole('radio')[0]
+      expect(selectedRadio).not.toBeChecked()
+
+      await user.click(selectedRadio)
+
+      expect(selectedRadio).toBeChecked()
+      expect(
+        screen.getByRole('button', {
+          name:
+            questionNumber === questions.length
+              ? 'See result'
+              : 'Continue',
+        }),
+      ).toBeEnabled()
       expectRawScoresToBeHidden()
       await user.click(
         screen.getByRole('button', {

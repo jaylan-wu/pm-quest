@@ -1,9 +1,16 @@
 import type { QuizQuestion } from '../types'
 
+const QUESTION_IMAGE_ASSET_PATH = `${import.meta.env.BASE_URL}assets/questions/`
+
 export const questions = [
   {
     id: 'q1',
     title: 'You wake up to start your day… how do you wake up?',
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-01.webp`,
+      alt: 'A person hides under pillows beside a bedside alarm clock.',
+      position: '50% 45%',
+    },
     choices: [
       {
         id: 'q1-snooze',
@@ -30,6 +37,10 @@ export const questions = [
   {
     id: 'q2',
     title: "It's time for breakfast. What are you having?",
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-02.webp`,
+      alt: 'A breakfast plate and coffee sit beside a newspaper.',
+    },
     choices: [
       {
         id: 'q2-celsius',
@@ -61,6 +72,10 @@ export const questions = [
   {
     id: 'q3',
     title: "It's time to commute to campus. How are you getting there?",
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-03.webp`,
+      alt: 'Commuters wait on a subway platform as a train passes.',
+    },
     choices: [
       {
         id: 'q3-roll-into-class',
@@ -87,6 +102,10 @@ export const questions = [
   {
     id: 'q4',
     title: "You've arrived at your first class of the day. What are you doing?",
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-04.webp`,
+      alt: 'Rows of seats in an empty college lecture hall.',
+    },
     choices: [
       {
         id: 'q4-front-row-notes',
@@ -113,6 +132,10 @@ export const questions = [
   {
     id: 'q5',
     title: 'Time for your Open Lab shift. What are you doing?',
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-05.webp`,
+      alt: 'Hands connect wires inside a small electronics project.',
+    },
     choices: [
       {
         id: 'q5-oll',
@@ -144,6 +167,11 @@ export const questions = [
   {
     id: 'q6',
     title: "Class and shifts are over. Now you have to study for an exam. What's your strategy?",
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-06.webp`,
+      alt: 'A student studies an open textbook at a desk.',
+      position: '50% 55%',
+    },
     choices: [
       {
         id: 'q6-lockbox-pomodoro',
@@ -170,6 +198,10 @@ export const questions = [
   {
     id: 'q7',
     title: 'Club sign-ups are next week! What are you planning to do?',
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-07.webp`,
+      alt: 'People browse stacks of books in a bookstore.',
+    },
     choices: [
       {
         id: 'q7-greek-life',
@@ -196,6 +228,11 @@ export const questions = [
   {
     id: 'q8',
     title: "Ingrid Slack messaged you to meet her in her office. What's it for?",
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-08.webp`,
+      alt: 'An empty office desk holds a laptop, lamp, and pencils.',
+      position: '50% 70%',
+    },
     choices: [
       {
         id: 'q8-lan-party',
@@ -222,6 +259,11 @@ export const questions = [
   {
     id: 'q9',
     title: 'You were planning to do laundry tonight, but your friends asked you to hang out. What do you do?',
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-09.webp`,
+      alt: 'Two people wait beside washing machines and a cart of laundry.',
+      position: '50% 55%',
+    },
     choices: [
       {
         id: 'q9-do-laundry',
@@ -248,6 +290,10 @@ export const questions = [
   {
     id: 'q10',
     title: "It's finally time for bed. What's your nighttime routine?",
+    image: {
+      src: `${QUESTION_IMAGE_ASSET_PATH}question-10.webp`,
+      alt: 'A person wearing a sleep mask rests in bed.',
+    },
     choices: [
       {
         id: 'q10-celsius',

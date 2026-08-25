@@ -8,6 +8,7 @@ import {
 
 import { TestSessionProvider } from '../features/personality-test/TestSessionProvider'
 import { AdventurePage } from '../pages/AdventurePage'
+import { GamerTypesPage } from '../pages/GamerTypesPage'
 import { LandingPage } from '../pages/LandingPage'
 import { ResultPage } from '../pages/ResultPage'
 
@@ -17,6 +18,7 @@ export function AppRoutes(): ReactElement {
       <Route path="/" element={<LandingPage />} />
       <Route path="/adventure" element={<AdventurePage />} />
       <Route path="/result" element={<ResultPage />} />
+      <Route path="/gamer-types" element={<GamerTypesPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

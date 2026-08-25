@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react'
+import { useEffect, type ReactElement } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 import { QuestionCard } from '../features/personality-test/components/QuestionCard'
@@ -8,6 +8,27 @@ import { useTestSession } from '../features/personality-test/useTestSession'
 export function AdventurePage(): ReactElement {
   const { state, dispatch } = useTestSession()
   const navigate = useNavigate()
+  const question = questions[state.currentQuestionIndex]
+  const selectedChoiceId = state.selectedAnswers.find(
+    (answer) => answer.questionId === question?.id,
+  )?.choiceId
+  const nextQuestionImageSource =
+    state.isStarted &&
+    !state.isComplete &&
+    selectedChoiceId !== undefined
+      ? questions[state.currentQuestionIndex + 1]?.image?.src
+      : undefined
+
+  useEffect(() => {
+    if (nextQuestionImageSource === undefined) {
+      return
+    }
+
+    const nextQuestionImage = new Image()
+    nextQuestionImage.decoding = 'async'
+    nextQuestionImage.fetchPriority = 'low'
+    nextQuestionImage.src = nextQuestionImageSource
+  }, [nextQuestionImageSource])
 
   if (!state.isStarted) {
     return <Navigate to="/" replace />
@@ -17,15 +38,9 @@ export function AdventurePage(): ReactElement {
     return <Navigate to="/result" replace />
   }
 
-  const question = questions[state.currentQuestionIndex]
-
   if (question === undefined) {
     return <Navigate to="/" replace />
   }
-
-  const selectedChoiceId = state.selectedAnswers.find(
-    (answer) => answer.questionId === question.id,
-  )?.choiceId
 
   function handleContinue(): void {
     const isFinalQuestion =

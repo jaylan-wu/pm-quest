@@ -612,7 +612,15 @@ deterministic tie-breaking rules
 For final character presentation, the source of truth is:
 
 ```text
-gamer-class metadata
+src/features/personality-test/data/gamerClasses.ts
 ```
 
-Do not conflate the two.
+This canonical presentation data supplies stable IDs, names, authored
+descriptions, and static character stats to both the individual result and the
+`/gamer-types` directory. The directory may mark the current in-memory result,
+but it does not calculate, persist, or alter that result. It must not expose raw
+choice weights, totals, intermediate rankings, or tie-breaking details.
+
+Do not conflate presentation metadata with question score mappings or use
+static gamer stats in result calculation. Adding the directory and its
+navigation does not change any scoring rule.

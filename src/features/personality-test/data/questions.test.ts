@@ -20,6 +20,59 @@ const EXPECTED_QUESTION_TITLES = [
 
 const EXPECTED_CHOICE_COUNTS = [4, 5, 4, 4, 5, 4, 4, 4, 4, 4] as const
 
+const EXPECTED_IMAGE_METADATA = [
+  {
+    filename: 'question-01.webp',
+    alt: 'A person hides under pillows beside a bedside alarm clock.',
+    position: '50% 45%',
+  },
+  {
+    filename: 'question-02.webp',
+    alt: 'A breakfast plate and coffee sit beside a newspaper.',
+    position: undefined,
+  },
+  {
+    filename: 'question-03.webp',
+    alt: 'Commuters wait on a subway platform as a train passes.',
+    position: undefined,
+  },
+  {
+    filename: 'question-04.webp',
+    alt: 'Rows of seats in an empty college lecture hall.',
+    position: undefined,
+  },
+  {
+    filename: 'question-05.webp',
+    alt: 'Hands connect wires inside a small electronics project.',
+    position: undefined,
+  },
+  {
+    filename: 'question-06.webp',
+    alt: 'A student studies an open textbook at a desk.',
+    position: '50% 55%',
+  },
+  {
+    filename: 'question-07.webp',
+    alt: 'People browse stacks of books in a bookstore.',
+    position: undefined,
+  },
+  {
+    filename: 'question-08.webp',
+    alt: 'An empty office desk holds a laptop, lamp, and pencils.',
+    position: '50% 70%',
+  },
+  {
+    filename: 'question-09.webp',
+    alt: 'Two people wait beside washing machines and a cart of laundry.',
+    position: '50% 55%',
+  },
+  {
+    filename: 'question-10.webp',
+    alt: 'A person wearing a sleep mask rests in bed.',
+    position: undefined,
+  },
+] as const
+
 describe('Day in the Life of a Peer Mentor question data', () => {
   it('contains the ten questions in their intended order', () => {
     expect(questions.map((question) => question.id)).toEqual(
@@ -40,6 +93,33 @@ describe('Day in the Life of a Peer Mentor question data', () => {
         0,
       ),
     ).toBe(42)
+  })
+
+  it('maps every question to its ordered WebP asset and authored alt text', () => {
+    const imageSources = questions.map((question) => question.image.src)
+
+    expect(
+      questions.map((question) => ({
+        src: question.image.src,
+        alt: question.image.alt,
+        position:
+          'position' in question.image
+            ? question.image.position
+            : undefined,
+      })),
+    ).toEqual(
+      EXPECTED_IMAGE_METADATA.map(({ filename, alt, position }) => ({
+        src: `${import.meta.env.BASE_URL}assets/questions/${filename}`,
+        alt,
+        position,
+      })),
+    )
+    expect(new Set(imageSources).size).toBe(questions.length)
+
+    for (const question of questions) {
+      expect(question.image.src.trim()).not.toBe('')
+      expect(question.image.alt.trim()).not.toBe('')
+    }
   })
 
   it('uses globally unique question and choice IDs', () => {
