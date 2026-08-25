@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { characters } from './data/characters'
+import { gamerClasses } from './data/gamerClasses'
 import { questions } from './data/questions'
 import {
   initialTestSessionState,
@@ -99,24 +99,33 @@ describe('testSessionReducer', () => {
     ).toBe(state)
   })
 
-  it('requires all eight answers before completing', () => {
-    const state = startTest()
+  it('requires all ten answers before completing', () => {
+    let state = startTest()
 
-    expect(questions).toHaveLength(8)
+    for (const question of questions.slice(0, -1)) {
+      state = testSessionReducer(state, {
+        type: 'ANSWER_QUESTION',
+        choiceId: question.choices[0].id,
+      })
+      state = testSessionReducer(state, { type: 'ADVANCE_QUESTION' })
+    }
+
+    expect(questions).toHaveLength(10)
+    expect(state.selectedAnswers).toHaveLength(9)
     expect(testSessionReducer(state, { type: 'COMPLETE_TEST' })).toBe(
       state,
     )
   })
 
-  it('completes all eight questions and calculates a character result', () => {
+  it('completes all ten questions and calculates a gamer-class result', () => {
     const state = completeTest()
 
-    expect(state.selectedAnswers).toHaveLength(8)
+    expect(state.selectedAnswers).toHaveLength(10)
     expect(state.isComplete).toBe(true)
     expect(state.result).not.toBeNull()
     expect(
-      characters.some(
-        (character) => character.id === state.result?.character.id,
+      gamerClasses.some(
+        (gamerClass) => gamerClass.id === state.result?.gamerClass.id,
       ),
     ).toBe(true)
   })

@@ -1,9 +1,9 @@
 import type { FormEvent, ReactElement } from 'react'
 
-import type { Question } from '../types'
+import type { QuizQuestion } from '../types'
 
 export interface QuestionCardProps {
-  readonly question: Question
+  readonly question: QuizQuestion
   readonly questionNumber: number
   readonly questionCount: number
   readonly selectedChoiceId?: string
@@ -27,16 +27,27 @@ export function QuestionCard({
   const isFinalQuestion = questionNumber === questionCount
 
   return (
-    <section className="surface" aria-labelledby="question-title">
-      <p className="muted">
+    <section
+      className="surface question-card"
+      aria-labelledby="question-title"
+    >
+      <p className="muted ui-label">
         Question {questionNumber} of {questionCount}
       </p>
+      <progress
+        className="quiz-progress"
+        value={questionNumber}
+        max={questionCount}
+        aria-label="Quiz progress"
+      >
+        {questionNumber} of {questionCount}
+      </progress>
       <h1 id="question-title">{question.title}</h1>
-      <p>{question.scenario}</p>
+      {question.scenario === undefined ? null : <p>{question.scenario}</p>}
 
       <form onSubmit={handleSubmit}>
         <fieldset>
-          <legend>Choose one response</legend>
+          <legend className="ui-label">Choose one response</legend>
           {question.choices.map((choice) => (
             <label className="choice" key={choice.id}>
               <input

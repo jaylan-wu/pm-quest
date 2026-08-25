@@ -41,7 +41,7 @@ export function AdventurePage(): ReactElement {
   }
 
   return (
-    <main className="page-shell">
+    <main className="page-shell quiz-page">
       <QuestionCard
         question={question}
         questionNumber={state.currentQuestionIndex + 1}

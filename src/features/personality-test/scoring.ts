@@ -1,18 +1,36 @@
 import { scoringConfig } from './data/scoringConfig'
 import {
-  traits,
-  type CharacterResult,
-  type CharacterScores,
-  type Choice,
-  type PersonalityResult,
-  type Question,
+  GAMER_CLASS_IDS,
+  type GamerClass,
+  type GamerClassId,
+  type GamerClassResult,
+  type GamerClassScores,
+  type QuizChoice,
+  type QuizQuestion,
   type ScoreSummary,
   type ScoringConfig,
   type SelectedAnswer,
-  type TraitScores,
 } from './types'
 
-function validateQuestions(questionsToScore: readonly Question[]): void {
+const STRONG_ASSOCIATION_SCORE = 3
+
+function createEmptyClassScores(): Record<GamerClassId, number> {
+  return {
+    moba: 0,
+    fps: 0,
+    rpg: 0,
+    sports: 0,
+    sandbox: 0,
+    mobile: 0,
+    tabletop: 0,
+  }
+}
+
+function isGamerClassId(value: string): value is GamerClassId {
+  return GAMER_CLASS_IDS.some((gamerClassId) => gamerClassId === value)
+}
+
+function validateQuestions(questionsToScore: readonly QuizQuestion[]): void {
   const questionIds = new Set<string>()
 
   for (const question of questionsToScore) {
@@ -29,46 +47,62 @@ function validateQuestions(questionsToScore: readonly Question[]): void {
       }
 
       choiceIds.add(choice.id)
+
+      for (const [classId, score] of Object.entries(choice.scores)) {
+        if (!isGamerClassId(classId)) {
+          throw new Error(`Unknown gamer class ID in choice ${choice.id}: ${classId}`)
+        }
+
+        if (!Number.isInteger(score) || score < 0 || score > STRONG_ASSOCIATION_SCORE) {
+          throw new Error(`Score for ${classId} in choice ${choice.id} must be 0, 1, 2, or 3`)
+        }
+      }
     }
   }
 }
 
 function validateScoringConfiguration(
-  charactersToScore: readonly CharacterResult[],
+  gamerClassesToScore: readonly GamerClass[],
   config: ScoringConfig,
 ): void {
-  if (charactersToScore.length === 0) {
-    throw new Error('At least one character is required to calculate a result')
-  }
-
-  const characterIds = new Set(charactersToScore.map((character) => character.id))
-
-  if (characterIds.size !== charactersToScore.length) {
-    throw new Error('Character IDs must be unique')
-  }
-
-  const priorityIds = new Set(config.characterTieBreakOrder)
+  const configuredClassIds = new Set(
+    gamerClassesToScore.map((gamerClass) => gamerClass.id),
+  )
 
   if (
-    priorityIds.size !== config.characterTieBreakOrder.length ||
-    priorityIds.size !== characterIds.size ||
-    config.characterTieBreakOrder.some((characterId) => !characterIds.has(characterId))
+    configuredClassIds.size !== GAMER_CLASS_IDS.length ||
+    gamerClassesToScore.length !== GAMER_CLASS_IDS.length ||
+    GAMER_CLASS_IDS.some((gamerClassId) => !configuredClassIds.has(gamerClassId))
   ) {
-    throw new Error('Tie-break order must contain every character ID exactly once')
+    throw new Error('Gamer-class data must contain every gamer class ID exactly once')
+  }
+
+  const priorityIds = new Set(config.gamerClassTieBreakOrder)
+
+  if (
+    priorityIds.size !== config.gamerClassTieBreakOrder.length ||
+    priorityIds.size !== configuredClassIds.size ||
+    config.gamerClassTieBreakOrder.some(
+      (gamerClassId) => !configuredClassIds.has(gamerClassId),
+    )
+  ) {
+    throw new Error('Tie-break order must contain every gamer class ID exactly once')
   }
 }
 
 function findSelectedChoice(
   answer: SelectedAnswer,
-  questionById: ReadonlyMap<string, Question>,
-): Choice {
+  questionById: ReadonlyMap<string, QuizQuestion>,
+): QuizChoice {
   const question = questionById.get(answer.questionId)
 
   if (!question) {
     throw new Error(`Unknown question ID: ${answer.questionId}`)
   }
 
-  const choice = question.choices.find((candidate) => candidate.id === answer.choiceId)
+  const choice = question.choices.find(
+    (candidate) => candidate.id === answer.choiceId,
+  )
 
   if (!choice) {
     throw new Error(
@@ -79,31 +113,19 @@ function findSelectedChoice(
   return choice
 }
 
-function createEmptyTraitScores(): Record<(typeof traits)[number], number> {
-  return {
-    collaboration: 0,
-    structure: 0,
-    adaptability: 0,
-  }
-}
-
 export function calculateScores(
   answers: readonly SelectedAnswer[],
-  questionsToScore: readonly Question[],
-  charactersToScore: readonly CharacterResult[],
-  config: ScoringConfig = scoringConfig,
+  questionsToScore: readonly QuizQuestion[],
 ): ScoreSummary {
   validateQuestions(questionsToScore)
-  validateScoringConfiguration(charactersToScore, config)
 
   const questionById = new Map(
     questionsToScore.map((question) => [question.id, question] as const),
   )
   const answeredQuestionIds = new Set<string>()
-  const traitScores = createEmptyTraitScores()
-  const directCharacterScores: Record<string, number> = Object.fromEntries(
-    charactersToScore.map((character) => [character.id, 0]),
-  )
+  const classScores = createEmptyClassScores()
+  const strongAssociationCounts = createEmptyClassScores()
+  const contributingQuestionCounts = createEmptyClassScores()
 
   for (const answer of answers) {
     if (answeredQuestionIds.has(answer.questionId)) {
@@ -113,63 +135,81 @@ export function calculateScores(
     answeredQuestionIds.add(answer.questionId)
     const choice = findSelectedChoice(answer, questionById)
 
-    for (const trait of traits) {
-      traitScores[trait] += choice.traitEffects[trait] ?? 0
+    for (const gamerClassId of GAMER_CLASS_IDS) {
+      const contribution = choice.scores[gamerClassId] ?? 0
+      classScores[gamerClassId] += contribution
+
+      if (contribution === STRONG_ASSOCIATION_SCORE) {
+        strongAssociationCounts[gamerClassId] += 1
+      }
+
+      if (contribution > 0) {
+        contributingQuestionCounts[gamerClassId] += 1
+      }
     }
-
-    for (const character of charactersToScore) {
-      directCharacterScores[character.id] += choice.characterEffects?.[character.id] ?? 0
-    }
-  }
-
-  const characterScores: Record<string, number> = {}
-
-  for (const character of charactersToScore) {
-    characterScores[character.id] =
-      directCharacterScores[character.id] +
-      traitScores[character.primaryTrait] * config.primaryTraitWeight +
-      traitScores[character.secondaryTrait] * config.secondaryTraitWeight
   }
 
   return {
-    traitScores: traitScores satisfies TraitScores,
-    characterScores: characterScores satisfies CharacterScores,
+    classScores: classScores satisfies GamerClassScores,
+    strongAssociationCounts: strongAssociationCounts satisfies GamerClassScores,
+    contributingQuestionCounts:
+      contributingQuestionCounts satisfies GamerClassScores,
   }
 }
 
-export function selectWinningCharacter(
-  characterScores: CharacterScores,
-  charactersToScore: readonly CharacterResult[],
-  config: ScoringConfig = scoringConfig,
-): CharacterResult {
-  validateScoringConfiguration(charactersToScore, config)
-
-  const characterById = new Map(
-    charactersToScore.map((character) => [character.id, character] as const),
-  )
-  const firstPriorityId = config.characterTieBreakOrder[0]
-  const firstCharacter = characterById.get(firstPriorityId)
-
-  if (!firstCharacter) {
-    throw new Error('Tie-break order must begin with a configured character')
+function candidateOutranksWinner(
+  candidateId: GamerClassId,
+  winnerId: GamerClassId,
+  scores: ScoreSummary,
+): boolean {
+  if (scores.classScores[candidateId] !== scores.classScores[winnerId]) {
+    return scores.classScores[candidateId] > scores.classScores[winnerId]
   }
 
-  let winner = firstCharacter
-  let winningScore = characterScores[winner.id]
+  if (
+    scores.strongAssociationCounts[candidateId] !==
+    scores.strongAssociationCounts[winnerId]
+  ) {
+    return (
+      scores.strongAssociationCounts[candidateId] >
+      scores.strongAssociationCounts[winnerId]
+    )
+  }
 
-  for (const characterId of config.characterTieBreakOrder.slice(1)) {
-    const character = characterById.get(characterId)
+  return (
+    scores.contributingQuestionCounts[candidateId] >
+    scores.contributingQuestionCounts[winnerId]
+  )
+}
 
-    if (!character) {
-      throw new Error(`Unknown character in tie-break order: ${characterId}`)
+export function selectWinningGamerClass(
+  scores: ScoreSummary,
+  gamerClassesToScore: readonly GamerClass[],
+  config: ScoringConfig = scoringConfig,
+): GamerClass {
+  validateScoringConfiguration(gamerClassesToScore, config)
+
+  const gamerClassById = new Map(
+    gamerClassesToScore.map((gamerClass) => [gamerClass.id, gamerClass] as const),
+  )
+  const firstPriorityId = config.gamerClassTieBreakOrder[0]
+
+  if (firstPriorityId === undefined) {
+    throw new Error('Tie-break order must contain every gamer class ID exactly once')
+  }
+
+  let winnerId = firstPriorityId
+
+  for (const candidateId of config.gamerClassTieBreakOrder.slice(1)) {
+    if (candidateOutranksWinner(candidateId, winnerId, scores)) {
+      winnerId = candidateId
     }
+  }
 
-    const score = characterScores[characterId]
+  const winner = gamerClassById.get(winnerId)
 
-    if (score > winningScore) {
-      winner = character
-      winningScore = score
-    }
+  if (!winner) {
+    throw new Error(`Unknown gamer class in tie-break order: ${winnerId}`)
   }
 
   return winner
@@ -177,16 +217,20 @@ export function selectWinningCharacter(
 
 export function calculateResult(
   answers: readonly SelectedAnswer[],
-  questionsToScore: readonly Question[],
-  charactersToScore: readonly CharacterResult[],
+  questionsToScore: readonly QuizQuestion[],
+  gamerClassesToScore: readonly GamerClass[],
   config: ScoringConfig = scoringConfig,
-): PersonalityResult {
-  const scores = calculateScores(answers, questionsToScore, charactersToScore, config)
-  const character = selectWinningCharacter(scores.characterScores, charactersToScore, config)
+): GamerClassResult {
+  const scores = calculateScores(answers, questionsToScore)
+  const gamerClass = selectWinningGamerClass(
+    scores,
+    gamerClassesToScore,
+    config,
+  )
 
   return {
-    character,
-    winningScore: scores.characterScores[character.id],
+    gamerClass,
+    winningScore: scores.classScores[gamerClass.id],
     ...scores,
   }
 }

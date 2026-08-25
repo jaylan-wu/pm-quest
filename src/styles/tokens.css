@@ -1,12 +1,26 @@
 :root {
-  --color-background: #f7f7f5;
-  --color-surface: #ffffff;
-  --color-text: #202124;
-  --color-muted: #5f6368;
-  --color-border: #c8c9cc;
-  --color-accent: #315b7d;
-  --color-accent-contrast: #ffffff;
-  --color-focus: #0b6bcb;
+  --color-purple: #9667e0;
+  --color-mauve: #d4bbfc;
+  --color-lavender-veil: #ebd9fc;
+  --color-lavender-mist: #f2ebfb;
+  --color-ghost-white: #fbfaff;
+
+  --color-background: var(--color-ghost-white);
+  --color-surface: var(--color-lavender-mist);
+  --color-surface-raised: #ffffff;
+  --color-surface-emphasis: var(--color-lavender-veil);
+
+  --color-primary: var(--color-purple);
+  --color-primary-hover: #8454d1;
+  --color-primary-soft: var(--color-mauve);
+
+  --color-border: var(--color-mauve);
+  --color-border-soft: var(--color-lavender-veil);
+
+  --color-text-primary: #241b31;
+  --color-text-secondary: #62576f;
+  --color-text-on-primary: #ffffff;
+  --color-focus: var(--color-primary);
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -16,15 +30,22 @@
   --space-8: 2rem;
   --space-12: 3rem;
 
-  --font-family-body: system-ui, -apple-system, blinkmacsystemfont, "Segoe UI",
-    sans-serif;
+  --font-primary: "Saira", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
   --font-size-small: 0.875rem;
   --font-size-body: 1rem;
   --font-size-heading: clamp(1.75rem, 5vw, 2.5rem);
-  --line-height-body: 1.5;
+  --line-height-body: 1.45;
+  --letter-spacing-display: -0.02em;
+  --letter-spacing-ui: 0.08em;
 
   --border-width: 1px;
-  --border-radius: 0.5rem;
-  --shadow-surface: 0 0.5rem 1.5rem rgb(32 33 36 / 8%);
-  --motion-fast: 120ms;
+  --border-radius: 0.875rem;
+  --border-radius-pill: 999px;
+  --shadow-surface: 0 1.25rem 3.125rem rgb(150 103 224 / 12%);
+  --motion-fast: 160ms;
 }

@@ -1,15 +1,18 @@
-import { characters } from './data/characters'
+import { gamerClasses } from './data/gamerClasses'
 import { questions } from './data/questions'
-import { calculateResult as calculatePersonalityResult } from './scoring'
-import type { PersonalityResult, Question, SelectedAnswer } from './types'
+import { calculateResult as calculateGamerClassResult } from './scoring'
+import type {
+  GamerClassResult,
+  QuizQuestion,
+  SelectedAnswer,
+} from './types'
 
 export interface TestSessionState {
   readonly isStarted: boolean
   readonly currentQuestionIndex: number
   readonly selectedAnswers: readonly SelectedAnswer[]
   readonly isComplete: boolean
-  readonly result: PersonalityResult | null
-  readonly storyFlags: Readonly<Record<string, boolean | string>>
+  readonly result: GamerClassResult | null
 }
 
 export type TestSessionAction =
@@ -25,10 +28,10 @@ export type TestSessionReducer = (
 ) => TestSessionState
 
 export interface TestSessionReducerConfiguration {
-  readonly questions: readonly Question[]
+  readonly questions: readonly QuizQuestion[]
   readonly calculateResult: (
     selectedAnswers: readonly SelectedAnswer[],
-  ) => PersonalityResult
+  ) => GamerClassResult
 }
 
 export const initialTestSessionState: TestSessionState = {
@@ -37,7 +40,6 @@ export const initialTestSessionState: TestSessionState = {
   selectedAnswers: [],
   isComplete: false,
   result: null,
-  storyFlags: {},
 }
 
 function startNewTest(): TestSessionState {
@@ -45,7 +47,6 @@ function startNewTest(): TestSessionState {
     ...initialTestSessionState,
     isStarted: true,
     selectedAnswers: [],
-    storyFlags: {},
   }
 }
 
@@ -53,7 +54,6 @@ function resetTest(): TestSessionState {
   return {
     ...initialTestSessionState,
     selectedAnswers: [],
-    storyFlags: {},
   }
 }
 
@@ -167,5 +167,5 @@ export function createTestSessionReducer({
 export const testSessionReducer = createTestSessionReducer({
   questions,
   calculateResult: (selectedAnswers) =>
-    calculatePersonalityResult(selectedAnswers, questions, characters),
+    calculateGamerClassResult(selectedAnswers, questions, gamerClasses),
 })

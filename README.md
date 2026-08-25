@@ -1,6 +1,6 @@
 # Choose Your Character
 
-A browser-based, choose-your-adventure personality test for a game-themed teaching assistant training event. The project is in its initial architecture stage and currently uses brief, neutral placeholder content that can be replaced as the event is developed.
+A browser-based personality quiz for a game-themed peer mentor / teaching assistant training event. Participants complete ten linear questions, and each answer awards hidden weighted points directly to one or more of seven gamer classes. Results use deterministic comparison rules, while each class's presentation stats remain static and independent of quiz scoring.
 
 ## Getting started
 

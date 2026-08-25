@@ -13,12 +13,13 @@ export function LandingPage(): ReactElement {
   }
 
   return (
-    <main className="page-shell">
-      <section className="surface" aria-labelledby="landing-title">
+    <main className="page-shell landing-page">
+      <section
+        className="surface landing-surface"
+        aria-labelledby="landing-title"
+      >
         <h1 id="landing-title">Choose Your Character</h1>
-        <p>
-          Make eight choices to receive a placeholder character result.
-        </p>
+        <p>Make ten choices to discover your gamer class.</p>
         <div className="actions">
           <button className="button" type="button" onClick={handleStart}>
             Start the test

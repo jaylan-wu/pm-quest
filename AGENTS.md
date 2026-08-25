@@ -1,66 +1,202 @@
 # AGENTS.md
 
-## Project overview
+## Project Overview
 
-This repository contains a browser-based choose-your-adventure personality test for a game-themed teaching assistant training event.
+This repository contains a browser-based personality quiz for a game-themed peer mentor / teaching assistant training event.
 
-Participants answer eight scenario-based questions. Their choices are evaluated using hidden scoring rules, and the application assigns them a starter character or character class at the end.
+Participants complete a 10-question experience titled around a "Day in the Life of a Peer Mentor."
 
-The specific story, questions, visual theme, and final character roster are still being developed. Build the application so this content can be replaced without restructuring the UI.
+Each answer awards hidden weighted points directly to one or more gamer classes. At the end of the quiz, the participant is assigned the gamer class with the strongest result.
 
-## Current project stage
+The quiz is intended to be playful and event-focused rather than a scientifically validated personality assessment.
 
-The project is currently establishing its core architecture and user flow.
+The current priority is a maintainable quiz engine and data model. Visual design, final score balancing, class artwork, and some written content may continue to evolve.
 
-Current priorities:
+---
 
-1. Establish a maintainable React application structure.
-2. Build a complete landing-to-result flow using placeholder content.
-3. Separate personality-test content from presentation components.
-4. Implement deterministic and testable scoring.
-5. Establish accessible, responsive UI foundations.
-6. Avoid premature visual polish and unnecessary dependencies.
+## Gamer Classes
+
+The application has exactly seven gamer classes.
+
+Use these stable internal IDs:
+
+```ts
+export type GamerClassId =
+  | "moba"
+  | "fps"
+  | "rpg"
+  | "sports"
+  | "sandbox"
+  | "mobile"
+  | "tabletop";
+```
+
+Display names:
+
+| ID         | Display Name   |
+| ---------- | -------------- |
+| `moba`     | MOBA Gamer     |
+| `fps`      | FPS Gamer      |
+| `rpg`      | RPG Gamer      |
+| `sports`   | Sports Gamer   |
+| `sandbox`  | Sandbox Gamer  |
+| `mobile`   | Mobile Gamer   |
+| `tabletop` | Tabletop Gamer |
+
+Do not use array position or numeric class IDs as the application's canonical representation.
+
+Legacy numerical mappings may appear in planning material:
+
+```text
+1 → moba
+2 → fps
+3 → rpg
+4 → sports
+5 → sandbox
+6 → mobile
+7 → tabletop
+```
+
+Convert these to stable string IDs when implementing application data.
+
+---
+
+## Current Quiz Structure
+
+The quiz contains exactly ten questions.
+
+The current flow is linear:
+
+```text
+Landing
+→ Question 1
+→ Question 2
+→ Question 3
+→ Question 4
+→ Question 5
+→ Question 6
+→ Question 7
+→ Question 8
+→ Question 9
+→ Question 10
+→ Result
+```
+
+There is no branching in the current product specification.
+
+Do not introduce:
+
+* conditional question routes
+* hidden alternate questions
+* story branches
+* branching state flags
+
+unless the product specification is explicitly changed later.
+
+---
+
+## Scoring Architecture
+
+Quiz choices award points directly to gamer classes.
+
+There is no intermediary personality-trait scoring layer.
+
+The scoring pipeline is:
+
+```text
+answer choice
+→ gamer-class score contribution
+→ accumulated gamer-class totals
+→ deterministic comparison
+→ resulting gamer class
+```
+
+A choice may award points to one or multiple classes.
+
+Example:
+
+```ts
+{
+  id: "q1-snooze",
+  text: "Snoozed and missed one or multiple alarms.",
+  scores: {
+    moba: 2,
+    fps: 2,
+  },
+}
+```
+
+Supported score weights are conceptually:
+
+```text
+3 = strong association
+2 = standard association
+1 = secondary association
+```
+
+A missing class entry means zero points.
+
+The exact score values are configuration data and may be rebalanced later.
+
+Do not hardcode scoring logic into React components.
+
+See `docs/SCORING.md` for the scoring specification.
+
+---
+
+## Gamer Stats
+
+Every resulting gamer class has predefined character statistics for presentation on the result screen.
+
+The current stat model is:
+
+```ts
+export interface GamerStats {
+  teamwork: number;
+  strategy: number;
+  creativity: number;
+  competitiveness: number;
+  adaptability: number;
+}
+```
+
+These values may be fictionalized and are primarily intended to support the game-character presentation.
+
+Important:
+
+**Gamer stats do not affect quiz scoring or result calculation.**
+
+They are static metadata associated with each class.
+
+Do not calculate these stats from participant answers unless the product specification is explicitly changed.
+
+---
 
 ## Technology
+
+The current application stack is expected to use:
 
 * React
 * TypeScript
 * Vite
 * React Router
-* React Context and `useReducer` for test-session state
-* Plain CSS with shared design tokens
+* React Context and/or `useReducer`
+* CSS with shared design tokens
 * Vitest
 * React Testing Library
 * ESLint
 
-Do not introduce additional production dependencies unless they solve a demonstrated requirement.
+Use the package manager already configured in the repository.
 
-## Commands
+Do not change package managers without explicit instruction.
 
-Use Yarn as the package manager.
+---
 
-```bash
-yarn install
-yarn dev
-yarn build
-yarn lint
-yarn test
-yarn test:run
-yarn typecheck
-```
+## Repository Organization
 
-Before considering work complete, run:
+Prefer feature-oriented organization.
 
-```bash
-yarn lint
-yarn typecheck
-yarn test:run
-yarn build
-```
-
-## Repository structure
-
-Application-wide setup belongs in:
+Application-wide configuration belongs in:
 
 ```text
 src/app/
@@ -72,209 +208,316 @@ Route-level screens belong in:
 src/pages/
 ```
 
-Personality-test behavior belongs in:
+Quiz behavior belongs in:
 
 ```text
 src/features/personality-test/
 ```
 
-Global styles and reusable design tokens belong in:
+Quiz data should remain separate from rendering logic.
+
+A typical feature structure may resemble:
+
+```text
+src/features/personality-test/
+├── components/
+├── data/
+│   ├── gamerClasses.ts
+│   └── questions.ts
+├── state/
+├── utils/
+│   └── calculateResult.ts
+└── types.ts
+```
+
+Global styling belongs in:
 
 ```text
 src/styles/
 ```
 
-Project decisions and feature documentation belong in:
+Project documentation belongs in:
 
 ```text
 docs/
 ```
 
-Keep files close to the feature that owns them. Do not create a generic `utils/` or `components/` directory at the root of `src` unless the code is genuinely shared by multiple features.
+Do not create generic shared abstractions until multiple real consumers justify them.
 
-## Application routes
+---
 
-The initial routes are:
+## Data-Driven Content
 
-```text
-/           Landing page
-/adventure  Personality-test flow
-/result     Final character result
+Questions, choices, gamer classes, score mappings, and gamer stats must be represented as data.
+
+Presentation components should not contain question-specific scoring behavior.
+
+Recommended question types:
+
+```ts
+export interface QuizChoice {
+  id: string;
+  text: string;
+  scores: Partial<Record<GamerClassId, number>>;
+}
+
+export interface QuizQuestion {
+  id: string;
+  title: string;
+  scenario?: string;
+  choices: QuizChoice[];
+}
 ```
 
-The result route must handle missing session data safely. A user who directly visits `/result` without completing the test should be redirected to the landing page or shown a clear restart action.
+Recommended class types:
 
-## Core domain model
+```ts
+export interface GamerStats {
+  teamwork: number;
+  strategy: number;
+  creativity: number;
+  competitiveness: number;
+  adaptability: number;
+}
 
-The personality test must be data-driven.
+export interface GamerClass {
+  id: GamerClassId;
+  name: string;
+  description: string;
+  stats: GamerStats;
+}
+```
 
-A question should contain:
+These interfaces may evolve as the UI develops, but preserve the separation between:
 
-* A stable ID
-* A title
-* Scenario text
-* Optional narrative metadata
-* An ordered collection of choices
+* quiz scoring data
+* class metadata
+* presentation logic
 
-A choice should contain:
+---
 
-* A stable ID
-* Display text
-* Trait or character scoring effects
-* Optional narrative effects
+## State Management
 
-A character result should contain:
+Keep quiz state minimal.
 
-* A stable ID
-* Name
-* Title or class
-* Description
-* Strengths
-* Growth area
-* Primary and secondary traits
-* Optional image and ability metadata
+The application may track:
 
-Do not hardcode question-specific behavior inside React components.
+* current question index
+* selected answers
+* quiz completion state
+* result
 
-## State management
+Class totals should preferably be derived from selected answers when this keeps the state model simpler and prevents duplicated state.
 
-Use React Context with `useReducer` for the initial implementation.
+Avoid storing the same information in multiple representations unless required for a clear performance or architectural reason.
 
-The test session should track:
+Do not introduce Redux, Zustand, or another external state-management library without demonstrated need.
 
-* Current question index
-* Selected answers
-* Accumulated scores
-* Whether the test is complete
-* Calculated result
-* Optional story flags for future branching
+---
 
-State transitions should use explicit reducer actions.
+## Result Calculation
 
-Do not store derived values when they can be calculated reliably from existing state.
+Result calculation must be implemented using pure functions.
 
-Do not add Redux, Zustand, or another state-management library during the initial implementation.
+Given identical question data and identical participant answers, the application must always produce the same result.
 
-## Scoring rules
+Random result selection is prohibited.
 
-Scoring logic must be implemented as pure functions.
+Tie-breaking order:
 
-Given the same answers and configuration, result calculation must always return the same result.
+1. Highest accumulated gamer-class score.
+2. Most `+3` contributions.
+3. Most distinct questions contributing points to that class.
+4. Fixed deterministic class priority.
 
-Tie-breaking behavior must be explicit and tested. Do not rely on object ordering, array accidents, random values, or UI state to resolve ties.
+The final priority must be explicitly defined and documented.
 
-Keep scoring configuration in data files and calculation behavior in utility modules.
+Do not rely on JavaScript object ordering or incidental array ordering as an undocumented tie-breaker.
 
-Document significant scoring decisions in `docs/SCORING.md`.
+---
 
-## Component expectations
+## TypeScript Conventions
 
-Components should be small and focused.
-
-Prefer composition over large components with many conditional branches.
-
-Presentation components should receive their content through typed props. They should not import the complete question or character datasets unless they are responsible for orchestrating that data.
-
-Use semantic HTML before adding ARIA attributes.
-
-All interactive controls must be keyboard accessible and show a visible focus state.
-
-Do not make clickable `div` elements when a `button` or `a` element is appropriate.
-
-## TypeScript conventions
-
-* Keep TypeScript strict.
+* Keep strict TypeScript enabled.
 * Avoid `any`.
-* Prefer `unknown` when external data has not been validated.
-* Define domain types in the feature’s `types.ts`.
-* Use discriminated unions for reducer actions.
-* Give exported functions explicit return types.
+* Prefer explicit domain types.
+* Use stable string IDs.
+* Prefer discriminated unions for reducer actions.
+* Give exported utility functions clear return types.
 * Prefer descriptive names over abbreviations.
-* Do not use TypeScript enums unless there is a demonstrated advantage over string unions or constant objects.
+* Avoid TypeScript enums unless they provide a specific advantage.
+* Do not encode domain behavior through unexplained magic numbers.
+
+---
+
+## Component Expectations
+
+Keep components focused on presentation or orchestration.
+
+Prefer:
+
+* typed props
+* semantic HTML
+* reusable quiz controls
+* composition
+
+Avoid:
+
+* scoring calculations inside buttons
+* direct mutation of quiz data
+* question-specific conditionals spread across components
+* clickable `div` elements when semantic controls exist
+
+All interactive functionality must remain keyboard accessible.
+
+Visible focus states are required.
+
+---
 
 ## Styling
 
-Use CSS custom properties in `src/styles/tokens.css` for:
+The visual direction may evolve as the game-night theme is developed.
 
-* Colors
-* Spacing
-* Typography
-* Borders
-* Shadows
-* Motion durations
-* Breakpoints where appropriate
+Keep foundational styling easy to reskin.
 
-Do not scatter unexplained color values throughout component files.
+Use shared CSS custom properties for reusable design values such as:
 
-The final game-night visual direction has not been chosen. Keep the initial interface intentionally neutral and easy to reskin.
+* colors
+* spacing
+* typography
+* borders
+* shadows
+* motion timing
 
-Support mobile and desktop layouts.
+Do not scatter unexplained hardcoded design values throughout components.
 
-Respect `prefers-reduced-motion` when animation is introduced.
+Support desktop and mobile layouts.
+
+Respect `prefers-reduced-motion` when animations are introduced.
+
+---
 
 ## Testing
 
-Test behavior rather than implementation details.
+Test behavior and domain rules rather than implementation details.
 
-At minimum, include tests for:
+Important test coverage includes:
 
-* Starting a new test
-* Selecting a choice
-* Advancing to the next question
-* Preventing invalid advancement
-* Completing all eight questions
-* Calculating a result
-* Deterministic tie-breaking
-* Restarting the test
-* Visiting the result page without completed test data
-
-Use accessible queries such as role, label, and visible text whenever possible.
+* starting the quiz
+* answering a question
+* progressing between questions
+* handling all ten questions
+* one answer contributing to one class
+* one answer contributing to multiple classes
+* score accumulation
+* result calculation
+* every tie-breaking stage
+* reset behavior
+* direct access to the result route without completed quiz data
+* predefined gamer stats not changing quiz outcomes
 
 Every scoring bug fix should include a regression test.
 
-## Working process
-
-Before making substantial changes:
-
-1. Inspect the relevant files.
-2. Summarize the current behavior.
-3. Identify assumptions or conflicts.
-4. Make the smallest coherent change.
-5. Add or update tests.
-6. Run the relevant verification commands.
-7. Review the final diff for unrelated changes.
-
-Do not rewrite functioning code only to match a personal preference.
-
-Do not change package managers.
-
-Do not modify generated lockfiles manually.
-
-Do not add a backend, database, authentication system, analytics platform, or external API unless the task explicitly requires it.
+---
 
 ## Documentation
 
-Update documentation when behavior or architectural decisions change.
+Use:
+
+```text
+README.md
+```
+
+for repository setup and common commands.
 
 Use:
 
-* `README.md` for setup and common commands.
-* `docs/PRODUCT.md` for the experience, audience, and requirements.
-* `docs/ARCHITECTURE.md` for technical boundaries and decisions.
-* `docs/SCORING.md` for traits, scoring, matching, and tie-breaking.
+```text
+docs/SCORING.md
+```
 
-Do not place temporary implementation notes in `AGENTS.md`.
+for class scoring, weighting, balancing, and tie-breaking.
 
-## Definition of done
+Use other documents under:
 
-A task is complete only when:
+```text
+docs/
+```
 
-* The requested behavior works.
-* TypeScript reports no errors.
-* Linting passes.
-* Relevant tests pass.
-* The production build succeeds.
-* New UI is keyboard accessible.
-* No unrelated files were changed.
-* Documentation is updated when required.
-* The final response summarizes the changes and verification performed.
+for architecture or product decisions when needed.
+
+Update documentation when the underlying architecture or product rules change.
+
+Do not use `AGENTS.md` as a scratchpad.
+
+---
+
+## Development Workflow
+
+Before making substantial changes:
+
+1. Read this file.
+2. Inspect the relevant implementation.
+3. Inspect relevant documentation.
+4. Identify the smallest coherent change.
+5. Preserve existing working behavior outside the requested scope.
+6. Update tests.
+7. Run relevant verification commands.
+8. Review the final diff for unrelated changes.
+
+Do not refactor unrelated code simply because another structure is preferred.
+
+Do not automatically rebalance quiz scores while implementing unrelated features.
+
+If ambiguous scoring data is encountered, flag it rather than silently inventing permanent product behavior.
+
+---
+
+## Verification
+
+Before considering a substantial implementation task complete, run the repository's equivalents of:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:run
+npm run build
+```
+
+If scripts differ, use the scripts defined by the repository rather than changing them unnecessarily.
+
+---
+
+## Out of Scope Unless Explicitly Requested
+
+Do not add:
+
+* a backend
+* a database
+* user accounts
+* authentication
+* analytics
+* external APIs
+* branching quiz paths
+* randomized results
+* machine-learning classification
+* new state-management frameworks
+
+unless explicitly required by a later task.
+
+---
+
+## Definition of Done
+
+A task is complete when:
+
+* requested behavior works
+* quiz scoring remains deterministic
+* TypeScript passes
+* linting passes
+* relevant tests pass
+* the production build succeeds
+* accessibility is preserved
+* unrelated behavior is unchanged
+* documentation reflects meaningful architectural changes
+* unresolved content or scoring ambiguities are reported

@@ -1,64 +1,54 @@
-export const traits = ['collaboration', 'structure', 'adaptability'] as const
+export type GamerClassId =
+  | 'moba'
+  | 'fps'
+  | 'rpg'
+  | 'sports'
+  | 'sandbox'
+  | 'mobile'
+  | 'tabletop'
 
-export type Trait = (typeof traits)[number]
+export const GAMER_CLASS_IDS = [
+  'moba',
+  'fps',
+  'rpg',
+  'sports',
+  'sandbox',
+  'mobile',
+  'tabletop',
+] as const satisfies readonly GamerClassId[]
 
 export type QuestionId = string
 
 export type ChoiceId = string
 
-export type CharacterId = string
+export type GamerClassScores = Readonly<Record<GamerClassId, number>>
 
-export type TraitEffects = Readonly<Partial<Record<Trait, number>>>
-
-export type CharacterEffects = Readonly<Partial<Record<CharacterId, number>>>
-
-export interface NarrativeMetadata {
-  readonly label?: string
-  readonly location?: string
-}
-
-export interface NarrativeEffect {
-  readonly flag: string
-  readonly value: boolean | string
-}
-
-export interface Choice {
+export interface QuizChoice {
   readonly id: ChoiceId
   readonly text: string
-  readonly traitEffects: TraitEffects
-  readonly characterEffects?: CharacterEffects
-  readonly narrativeEffects?: readonly NarrativeEffect[]
+  readonly scores: Readonly<Partial<Record<GamerClassId, number>>>
 }
 
-export interface Question {
+export interface QuizQuestion {
   readonly id: QuestionId
   readonly title: string
-  readonly scenario: string
-  readonly narrative?: NarrativeMetadata
-  readonly choices: readonly Choice[]
+  readonly scenario?: string
+  readonly choices: readonly QuizChoice[]
 }
 
-export interface CharacterImage {
-  readonly src: string
-  readonly alt: string
+export interface GamerStats {
+  readonly teamwork: number
+  readonly strategy: number
+  readonly creativity: number
+  readonly competitiveness: number
+  readonly adaptability: number
 }
 
-export interface CharacterAbility {
+export interface GamerClass {
+  readonly id: GamerClassId
   readonly name: string
   readonly description: string
-}
-
-export interface CharacterResult {
-  readonly id: CharacterId
-  readonly name: string
-  readonly title: string
-  readonly description: string
-  readonly strengths: readonly string[]
-  readonly growthArea: string
-  readonly primaryTrait: Trait
-  readonly secondaryTrait: Trait
-  readonly image?: CharacterImage
-  readonly ability?: CharacterAbility
+  readonly stats: GamerStats
 }
 
 export interface SelectedAnswer {
@@ -66,24 +56,19 @@ export interface SelectedAnswer {
   readonly choiceId: ChoiceId
 }
 
-export type TraitScores = Readonly<Record<Trait, number>>
-
-export type CharacterScores = Readonly<Record<CharacterId, number>>
-
 export interface ScoreSummary {
-  readonly traitScores: TraitScores
-  readonly characterScores: CharacterScores
+  readonly classScores: GamerClassScores
+  readonly strongAssociationCounts: GamerClassScores
+  readonly contributingQuestionCounts: GamerClassScores
 }
 
-export interface PersonalityResult extends ScoreSummary {
-  readonly character: CharacterResult
+export interface GamerClassResult extends ScoreSummary {
+  readonly gamerClass: GamerClass
   readonly winningScore: number
 }
 
-export type TestResult = PersonalityResult
+export type TestResult = GamerClassResult
 
 export interface ScoringConfig {
-  readonly primaryTraitWeight: number
-  readonly secondaryTraitWeight: number
-  readonly characterTieBreakOrder: readonly CharacterId[]
+  readonly gamerClassTieBreakOrder: readonly GamerClassId[]
 }

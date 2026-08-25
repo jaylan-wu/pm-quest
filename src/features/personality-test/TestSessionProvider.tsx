@@ -1,6 +1,5 @@
 import { useReducer, type PropsWithChildren, type ReactElement } from 'react'
 
-import { characters } from './data/characters'
 import { questions } from './data/questions'
 import { calculateScores } from './scoring'
 import { TestSessionContext } from './sessionContext'
@@ -19,7 +18,6 @@ export function TestSessionProvider({
   const accumulatedScores = calculateScores(
     state.selectedAnswers,
     questions,
-    characters,
   )
 
   return (

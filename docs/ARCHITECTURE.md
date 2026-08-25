@@ -19,21 +19,25 @@ Feature-owned components and helpers stay with the personality-test feature. A r
 ```text
 /           Landing page
 /adventure  Question flow
-/result     Completed character result
+/result     Completed gamer-class result
 ```
 
 The result route must not assume valid session data. It redirects to the landing page or presents a clear restart action when no completed result exists.
 
 ## Data and state flow
 
-Questions, choices, traits, and characters are typed configuration rather than component-specific logic. Route screens compose presentation components and supply the relevant content through typed props.
+Questions, choices, score mappings, and gamer classes are typed configuration rather than component-specific logic. The seven classes use stable string IDs: `moba`, `fps`, `rpg`, `sports`, `sandbox`, `mobile`, and `tabletop`. Each choice contains a partial mapping of those IDs to hidden weights, allowing one answer to contribute directly to one or more classes. Route screens compose presentation components and never expose those weights.
 
-The session provider exposes state, live accumulated scores, and explicit reducer actions for starting, answering, advancing, completing, calculating a result, and resetting. The reducer coordinates the session; pure scoring functions perform score accumulation and result matching. Accumulated scores are derived from selected answers at the context boundary instead of being duplicated in reducer state, preventing the two values from drifting apart.
+The session provider owns the current question index, selected answers, completion state, and final result. Explicit reducer actions start, answer, advance, complete, and reset the quiz. Class totals are derived from selected answers rather than duplicated in reducer state, preventing the values from drifting apart.
 
-The initial flow is entirely client-side and in memory. Story metadata and flags may extend the domain later without changing the current routes or presentation structure.
+Pure scoring functions accumulate direct class contributions and compare candidates in four deterministic stages: highest total score, most `+3` contributions, most distinct questions contributing points, and a centrally defined fixed class priority. The same question data and answers therefore always produce the same result. There is no intermediary trait layer or random selection.
+
+Gamer-class metadata contains authored descriptions and predefined teamwork, strategy, creativity, competitiveness, and adaptability stats. The result screen reads these values for presentation only; they are never inputs to score accumulation or winner selection.
+
+The flow is entirely client-side, linear, and in memory: landing, ten ordered questions, then result. The domain has no story flags, conditional question paths, or branching routes.
 
 ## Testing and dependencies
 
-Unit tests cover reducer transitions, invalid advancement, completion, reset, result calculation, and deterministic ties. Route and interaction tests should use accessible queries and test behavior rather than implementation details.
+Unit tests cover reducer transitions, invalid advancement, all ten questions, completion, reset, direct and multi-class contributions, score accumulation, each deterministic comparison stage, and the separation of presentation stats from scoring. Route and interaction tests cover the complete flow and safe direct result access using accessible queries and behavior rather than implementation details.
 
 Production dependencies remain limited to React, React DOM, and React Router until another dependency addresses a demonstrated requirement.
