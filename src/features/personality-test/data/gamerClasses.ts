@@ -6,11 +6,11 @@ export const gamerClasses = [
     name: 'MOBA Gamer',
     description: 'Coordinates with a team and keeps the shared objective in view.',
     stats: {
-      teamwork: 9,
-      strategy: 9,
-      creativity: 6,
-      competitiveness: 10,
-      adaptability: 8,
+      teamwork: 8,
+      strategy: 8,
+      creativity: 5,
+      competitiveness: 9,
+      adaptability: 7,
     },
   },
   {
@@ -20,7 +20,7 @@ export const gamerClasses = [
     stats: {
       teamwork: 7,
       strategy: 7,
-      creativity: 5,
+      creativity: 4,
       competitiveness: 10,
       adaptability: 9,
     },
@@ -34,7 +34,7 @@ export const gamerClasses = [
       strategy: 9,
       creativity: 8,
       competitiveness: 5,
-      adaptability: 7,
+      adaptability: 8,
     },
   },
   {
@@ -42,7 +42,7 @@ export const gamerClasses = [
     name: 'Sports Gamer',
     description: 'Builds momentum through teamwork, practice, and friendly competition.',
     stats: {
-      teamwork: 8,
+      teamwork: 9,
       strategy: 7,
       creativity: 5,
       competitiveness: 9,
@@ -55,7 +55,7 @@ export const gamerClasses = [
     description: 'Experiments freely and finds creative possibilities in open-ended problems.',
     stats: {
       teamwork: 6,
-      strategy: 7,
+      strategy: 8,
       creativity: 10,
       competitiveness: 4,
       adaptability: 9,
@@ -66,11 +66,11 @@ export const gamerClasses = [
     name: 'Mobile Gamer',
     description: 'Makes useful progress in the moment and adapts to the time available.',
     stats: {
-      teamwork: 5,
-      strategy: 6,
-      creativity: 7,
-      competitiveness: 6,
-      adaptability: 8,
+      teamwork: 6,
+      strategy: 7,
+      creativity: 8,
+      competitiveness: 7,
+      adaptability: 9,
     },
   },
   {
@@ -78,11 +78,11 @@ export const gamerClasses = [
     name: 'Tabletop Gamer',
     description: 'Brings people together through communication, planning, and shared play.',
     stats: {
-      teamwork: 10,
-      strategy: 10,
+      teamwork: 9,
+      strategy: 9,
       creativity: 8,
-      competitiveness: 7,
-      adaptability: 6,
+      competitiveness: 6,
+      adaptability: 5,
     },
   },
 ] as const satisfies readonly GamerClass[]

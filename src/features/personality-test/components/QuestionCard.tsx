@@ -46,7 +46,7 @@ export function QuestionCard({
       aria-labelledby="question-title"
     >
       <header className="quiz-header">
-        <span className="quiz-brand ui-label">Choose your character</span>
+        <span className="quiz-brand ui-label">Day in the Life</span>
       </header>
 
       <div className="quiz-progress-block">
@@ -70,9 +70,6 @@ export function QuestionCard({
       <QuestionImage image={question.image} />
 
       <div className="question-prompt">
-        <p className="muted ui-label">
-          Question {questionNumber} of {questionCount}
-        </p>
         <h1 id="question-title" ref={questionTitleRef} tabIndex={-1}>
           {question.title}
         </h1>

@@ -18,8 +18,11 @@ export function LandingPage(): ReactElement {
         className="surface landing-surface"
         aria-labelledby="landing-title"
       >
-        <h1 id="landing-title">Choose Your Character</h1>
-        <p>Make ten choices to discover your gamer class.</p>
+        <h1 id="landing-title">Day in the Life of a Peer Mentor</h1>
+        <p>
+          Navigate ten moments in a peer mentor&apos;s day to discover your
+          gamer class.
+        </p>
         <div className="actions">
           <button className="button" type="button" onClick={handleStart}>
             Start the test

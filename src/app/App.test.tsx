@@ -73,7 +73,7 @@ describe('personality test routes', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: 'Choose Your Character',
+        name: 'Day in the Life of a Peer Mentor',
       }),
     ).toBeInTheDocument()
   })
@@ -246,9 +246,12 @@ describe('personality test routes', () => {
     for (const [questionIndex, question] of questions.entries()) {
       const questionNumber = questionIndex + 1
 
+      expect(screen.getByText('Day in the Life')).toBeInTheDocument()
       expect(
-        screen.getByText(`Question ${questionNumber} of ${questions.length}`),
-      ).toBeInTheDocument()
+        screen.queryByText(
+          `Question ${questionNumber} of ${questions.length}`,
+        ),
+      ).not.toBeInTheDocument()
       expect(
         screen.getByRole('progressbar', { name: 'Quiz progress' }),
       ).toHaveAttribute('value', String(questionNumber))
@@ -321,13 +324,15 @@ describe('personality test routes', () => {
     await user.click(restartButton)
 
     expect(
-      await screen.findByRole('heading', { name: 'Choose Your Character' }),
+      await screen.findByRole('heading', {
+        name: 'Day in the Life of a Peer Mentor',
+      }),
     ).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Start the test' }))
 
     expect(
-      await screen.findByText(`Question 1 of ${questions.length}`),
+      await screen.findByRole('heading', { name: questions[0].title }),
     ).toBeInTheDocument()
     for (const radio of screen.getAllByRole('radio')) {
       expect(radio).not.toBeChecked()

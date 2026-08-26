@@ -382,19 +382,23 @@ export interface GamerStats {
 }
 ```
 
-Suggested initial placeholder values:
+Balanced presentation values:
 
 | Class    | Teamwork | Strategy | Creativity | Competitiveness | Adaptability |
 | -------- | -------: | -------: | ---------: | --------------: | -----------: |
-| MOBA     |        9 |        9 |          6 |              10 |            8 |
-| FPS      |        7 |        7 |          5 |              10 |            9 |
-| RPG      |        7 |        9 |          8 |               5 |            7 |
-| Sports   |        8 |        7 |          5 |               9 |            7 |
-| Sandbox  |        6 |        7 |         10 |               4 |            9 |
-| Mobile   |        5 |        6 |          7 |               6 |            8 |
-| Tabletop |       10 |       10 |          8 |               7 |            6 |
+| MOBA     |        8 |        8 |          5 |               9 |            7 |
+| FPS      |        7 |        7 |          4 |              10 |            9 |
+| RPG      |        7 |        9 |          8 |               5 |            8 |
+| Sports   |        9 |        7 |          5 |               9 |            7 |
+| Sandbox  |        6 |        8 |         10 |               4 |            9 |
+| Mobile   |        6 |        7 |          8 |               7 |            9 |
+| Tabletop |        9 |        9 |          8 |               6 |            5 |
 
-These values are intentionally provisional.
+Each class has a total of 37 points across the five stats, for an average of
+7.4. The distribution within that shared budget preserves each class's
+distinctive strengths and weaknesses.
+
+These values remain intentionally provisional.
 
 They may be changed for:
 

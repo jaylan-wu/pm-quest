@@ -115,6 +115,18 @@ describe('personality-test data', () => {
       }
     }
   })
+
+  it('balances total presentation stats across gamer classes', () => {
+    const statTotals = gamerClasses.map((gamerClass) =>
+      Object.values(gamerClass.stats).reduce(
+        (total, stat) => total + stat,
+        0,
+      ),
+    )
+    const statTotalSpread = Math.max(...statTotals) - Math.min(...statTotals)
+
+    expect(statTotalSpread).toBeLessThanOrEqual(1)
+  })
 })
 
 describe('calculateScores', () => {
